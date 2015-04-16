@@ -1,15 +1,19 @@
 <head>
 <script language="JavaScript" src="bioseq.js"></script>
 <style type="text/css">
-<!--
-	#container { position: relative; }
-	#canvas { border: 1px solid #000; }
-	body { font: 12px "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif; }
-	textarea { font: 100% "consolas", "Andale Mono", Monaco, Courier; overflow: auto }
--->
+	<!--
+		#container { position: relative; }
+		#canvas { border: 1px solid #000; }
+		body { font: 14px Helvetica, Arial, sans-serif; }
+		textarea { font: 100% "consolas", "Andale Mono", Monaco, Courier; overflow: auto }
+	-->
 </style>
 </head>
 <body>
+<h2>bioseq.js demo</h2>
+<div style="font-size:10pt;font-style:italic">
+	<p>Forked from Heng Li's <a href="https://github.com/lh3/bioseq-js" target="_blank">bioseq.js project</a>. Source code on <a href="https://github.com/stephenturner/bioseq" target="_blank">GitHub</a>.</p>
+</div>
 <script type="text/javascript">
 function do_align()
 {
@@ -52,11 +56,11 @@ onClick="document.getElementById('target').value = document.getElementById('pa-M
 </p>
 <p>
 Target sequence:<br>
-<textarea id="target" rows="10" cols="110">ATAGCTAGCTAGCATAAGC</textarea>
+<textarea id="target" rows="10" cols="100">ATAGCTAGCTAGCATAAGC</textarea>
 </p>
 <p>
 Query sequence:<br>
-<textarea id="query" rows="10" cols="110">AGCTAcCGCAT</textarea>
+<textarea id="query" rows="10" cols="100">AGCTACCGCAT</textarea>
 </p>
 <p>
 <input type="button" value="Align" onClick="do_align();"/>
