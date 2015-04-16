@@ -1,3 +1,5 @@
+Cloned from [Heng Li's bioseq-js](https://github.com/lh3/bioseq-js) just for toying around.
+
 In an online conversation, Istvan Albert was complaining he could not find a
 good Smith-Waterman implementation in Javascript. I thought I could write one
 over night by porting ksw.c to javascript. It took longer than I planned
