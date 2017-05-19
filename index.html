@@ -1,15 +1,19 @@
 <head>
 <script language="JavaScript" src="bioseq.js"></script>
 <style type="text/css">
-<!--
-	#container { position: relative; }
-	#canvas { border: 1px solid #000; }
-	body { font: 12px "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif; }
-	textarea { font: 100% "consolas", "Andale Mono", Monaco, Courier; overflow: auto }
--->
+	<!--
+		#container { position: relative;}
+		#canvas { border: 1px solid #000;}
+		body { font: 14px Helvetica, Arial, sans-serif;}
+		textarea { font: 100% "consolas", "Andale Mono", Monaco, Courier; overflow: auto }
+	-->
 </style>
 </head>
 <body>
+<h2>bioseq.js demo</h2>
+<div style="font-size:10pt;font-style:italic">
+	<p>Forked from Heng Li's <a href="https://github.com/lh3/bioseq-js" target="_blank">bioseq.js project</a>. Source code on <a href="https://github.com/stephenturner/bioseq" target="_blank">GitHub</a>.</p>
+</div>
 <script type="text/javascript">
 function do_align()
 {
@@ -30,7 +34,7 @@ function do_align()
 	str += 'alignment:\n\n';
 	var fmt = bsa_cigar2gaps(target, query, rst[1], rst[2]);
 
-	var linelen = 100, n_lines = 10;
+	var linelen = 80, n_lines = 10;
 	for (var l = 0; l < fmt[0].length; l += linelen) {
 		str += fmt[0].substr(l, linelen) + '\n';
 		str += fmt[1].substr(l, linelen) + '\n\n';
@@ -52,11 +56,11 @@ onClick="document.getElementById('target').value = document.getElementById('pa-M
 </p>
 <p>
 Target sequence:<br>
-<textarea id="target" rows="10" cols="110">ATAGCTAGCTAGCATAAGC</textarea>
+<textarea id="target" rows="10" cols="80">ATAGCTAGCTAGCATAAGC</textarea>
 </p>
 <p>
 Query sequence:<br>
-<textarea id="query" rows="10" cols="110">AGCTAcCGCAT</textarea>
+<textarea id="query" rows="10" cols="80">AGCTACCGCAT</textarea>
 </p>
 <p>
 <input type="button" value="Align" onClick="do_align();"/>
@@ -67,7 +71,7 @@ gap open: <input size="3" value="-1" id="gapo"/>
 extension: <input size="3" value="-1" id="gape"/>
 <span id="runtime" style="color: gray;"></span>
 </p>
-<textarea id="out" rows="7" readOnly style="border: 0" cols="110" wrap="on" style="overflow:hidden"></textarea>
+<textarea id="out" rows="7" readOnly style="border: 0" cols="80" wrap="on" style="overflow:hidden"></textarea>
 <textarea id="hs-dloop" style="display: none">
 TTCTTTCATGGGGAAGCAGATTTGGGTACCACCCAAGTATTGACTCACCCATCAACAACC
 GCTATGTATTTCGTACATTACTGCCAGCCACCATGAATATTGTACGGTACCATAAATACT
