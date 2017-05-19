@@ -1,3 +1,8 @@
+
+'use strict';
+
+(function(){
+
 /**************************
  *** Common data tables ***
  **************************/
@@ -22,10 +27,7 @@ var bst_nt5 = [
 	4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4
 ];
 
-/************************
- *** Generic routines ***
- ************************/
-
+//## Generic routines
 /**
  * Encode a sequence string with table
  *
@@ -35,19 +37,15 @@ var bst_nt5 = [
  * @return an integer array
  */
 
-function bsg_enc_seq(seq, table)
-{
+function bsg_enc_seq(seq, table){
 	if (table == null) return null;
-	var s = [];
-	s.length = seq.length;
+	var s = new Array(seq.length);
 	for (var i = 0; i < seq.length; ++i)
 		s[i] = table[seq.charCodeAt(i)];
 	return s;
 }
 
-/**************************
- *** Pairwise alignment ***
- **************************/
+//## Pairwise Alignment
 
 /*
  * The following implements local and global pairwise alignment with affine gap
@@ -106,18 +104,20 @@ function bsg_enc_seq(seq, table)
  * @return sqaure scoring matrix. The last row and column are zero, for
  * matching an ambiguous residue.
  */
-function bsa_gen_score_matrix(n, a, b)
-{
+function bsa_gen_score_matrix(n, a, b){
 	var m = [];
 	if (b > 0) b = -b; // mismatch score b should be non-positive
-	for (var i = 0; i < n - 1; ++i) {
+	for (var i = 0; i < n - 1; ++i){
 		m[i] = [];
-		for (var j = 0; j < n - 1; ++j)
-			m[i][j] = i == j? a : b;
+		for (var j = 0; j < n - 1; ++j){
+      m[i][j] = i == j? a : b;
+    }
 		m[i][j] = 0;
 	}
 	m[n-1] = [];
-	for (var j = 0; j < n; ++j) m[n-1][j] = 0;
+	for (var j = 0; j < n; ++j){
+    m[n-1][j] = 0;
+  }
 	return m;
 }
 
@@ -130,20 +130,23 @@ function bsa_gen_score_matrix(n, a, b)
  *
  * @return query profile. It is a two-dimensional integer matrix.
  */
-function bsa_gen_query_profile(_s, _m, table)
-{
+function bsa_gen_query_profile(_s, _m, table){
 	var s = typeof _s == 'string'? bsg_enc_seq(_s, table) : _s;
 	var qp = [], matrix;
-	if (_m.length >= 2 && typeof _m[0] == 'number' && typeof _m[1] == 'number') { // match/mismatch score
+	if (_m.length >= 2 && typeof _m[0] == 'number' && typeof _m[1] == 'number'){ // match/mismatch score
 		if (table == null) return null;
 		var n = typeof table == 'number'? table : table[table.length-1] + 1;
 		matrix = bsa_gen_score_matrix(n, _m[0], _m[1]);
-	} else matrix = _m; // _m is already a matrix; FIXME: check if it is really a square matrix!
-	for (var j = 0; j < matrix.length; ++j) {
+	} else {
+    //TODO: check if it is really a square matrix!
+    matrix = _m; // _m is already a matrix;
+  }
+	for (var j = 0; j < matrix.length; ++j){
 		var qpj, mj = matrix[j];
 		qpj = qp[j] = [];
-		for (var i = 0; i < s.length; ++i)
+		for (var i = 0; i < s.length; ++i){
 			qpj[i] = mj[s[i]];
+    }
 	}
 	return qp;
 }
@@ -163,8 +166,7 @@ function bsa_gen_query_profile(_s, _m, table)
  * higher 28 bits keeps the length and lower 4 bits the operation in order of
  * "MIDNSH". See bsa_cigar2str() for converting cigar to string.
  */
-function bsa_align(is_local, target, query, matrix, gapsc, w, table)
-{
+function bsa_align(is_local, target, query, matrix, gapsc, w, table){
 	// convert bases to integers
 	if (table == null) table = bst_nt5;
 	var t = bsg_enc_seq(target, table);
@@ -176,7 +178,7 @@ function bsa_align(is_local, target, query, matrix, gapsc, w, table)
 	w = w == null || w < 0? max_len : w;
 	var len_diff = t.target > qlen? t.target - qlen : qlen - t.target;
 	w = w > len_diff? w : len_diff;
-	
+
 	// set gap score
 	var gapo, gape; // these are penalties which should be non-negative
 	if (typeof gapsc == 'number') gapo = 0, gape = gapsc > 0? gapsc : -gapsc;
@@ -184,30 +186,33 @@ function bsa_align(is_local, target, query, matrix, gapsc, w, table)
 	var gapoe = gapo + gape; // penalty for opening the first gap
 
 	// initial values
-	var NEG_INF = -0x40000000;
 	var H = [], E = [], z = [], score, max = 0, end_i = -1, end_j = -1;
-	if (is_local) {
-		for (var j = 0; j <= qlen; ++j) H[j] = E[j] = 0;
+	if (is_local){
+		for (var j = 0; j <= qlen; ++j){ H[j] = E[j] = 0; }
 	} else {
 		H[0] = 0; E[0] = -gapoe - gapoe;
-		for (var j = 1; j <= qlen; ++j) {
-			if (j >= w) H[j] = E[j] = NEG_INF; // everything is -inf outside the band
-			else H[j] = -(gapo + gape * j), E[j] = E[j-1] - gape;
+		for (var j = 1; j <= qlen; ++j){
+			if (j >= w){
+        // everything is -inf outside the band
+        H[j] = E[j] = Number.NEGATIVE_INFINITY;
+      } else {
+        H[j] = -(gapo + gape * j), E[j] = E[j-1] - gape;
+      }
 		}
 	}
 
 	// the DP loop
-	for (var i = 0; i < t.length; ++i) {
+	for (var i = 0; i < t.length; ++i){
 		var h1 = 0, f = 0, m = 0, mj = -1;
 		var zi, qpi = qp[t[i]];
 		zi = z[i] = [];
 		var beg = i > w? i - w : 0;
 		var end = i + w + 1 < qlen? i + w + 1 : qlen; // only loop through [beg,end) of the query sequence
-		if (!is_local) {
-			h1 = beg > 0? NEG_INF : -gapoe - gape * i;
-			f = beg > 0? NEG_INF : -gapoe - gapoe - gape * i;
+		if (!is_local){
+			h1 = beg > 0? Number.NEGATIVE_INFINITY : -gapoe - gape * i;
+			f = beg > 0? Number.NEGATIVE_INFINITY : -gapoe - gapoe - gape * i;
 		}
-		for (var j = beg; j < end; ++j) {
+		for (var j = beg; j < end; ++j){
 			// At the beginning of the loop: h=H[j]=H(i-1,j-1), e=E[j]=E(i,j), f=F(i,j) and h1=H(i,j-1)
 			// If we only want to compute the max score, delete all lines involving direction "d".
 			var e = E[j], h = H[j], d;
@@ -232,73 +237,125 @@ function bsa_align(is_local, target, query, matrix, gapsc, w, table)
 			f = f > h? f : h;    // f = F(i,j+1)
 			zi[j] = d;           // z[i,j] keeps h for the current cell and e/f for the next cell
 		}
-		H[end] = h1, E[end] = is_local? 0 : NEG_INF;
-		if (m > max) max = m, end_i = i, end_j = mj;
+		H[end] = h1, E[end] = is_local? 0 : Number.NEGATIVE_INFINITY;
+		if (m > max){
+      max = m;
+      end_i = i;
+      end_j = mj;
+    }
 	}
-	if (is_local && max == 0) return null;
-	score = is_local? max : H[qlen];
+	if (is_local && max == 0){ return null; }
+	score = is_local ? max : H[qlen];
 
 	// backtrack to recover the alignment/cigar
-	function push_cigar(ci, op, len) {
+	function push_cigar(ci, op, len){
 		if (ci.length == 0 || op != (ci[ci.length-1]&0xf))
 			ci.push(len<<4|op);
 		else ci[ci.length-1] += len<<4;
 	}
+
 	var cigar = [], tmp, which = 0, i, k, start_i = 0;
-	if (is_local) {
+
+	if (is_local){
 		i = end_i, k = end_j;
-		if (end_j != qlen - 1) // then add soft cliping
+		if (end_j != qlen - 1){
+      // then add soft cliping
 			push_cigar(cigar, 4, qlen - 1 - end_j);
-	} else i = t.length - 1, k = (i + w + 1 < qlen? i + w + 1 : qlen) - 1; // (i,k) points to the last cell
-	while (i >= 0 && k >= 0) {
+    }
+	} else {
+    // (i,k) points to the last cell
+    i = t.length - 1;
+    k = (i + w + 1 < qlen? i + w + 1 : qlen) - 1;
+  }
+
+	while (i >= 0 && k >= 0){
 		tmp = z[i][k - (i > w? i - w : 0)];
 		which = tmp >> (which << 1) & 3;
 		if (which == 0 && tmp>>6) break;
 		if (which == 0) which = tmp & 3;
-		if (which == 0)      { push_cigar(cigar, 0, 1); --i, --k; } // match
-		else if (which == 1) { push_cigar(cigar, 2, 1); --i; } // deletion
-		else                 { push_cigar(cigar, 1, 1), --k; } // insertion
+		if (which == 0){
+      // match
+      push_cigar(cigar, 0, 1); --i, --k;
+    } else if (which == 1){
+      // deletion
+      push_cigar(cigar, 2, 1); --i;
+    }	else {
+      // insertion
+      push_cigar(cigar, 1, 1), --k;
+    }
 	}
-	if (is_local) {
-		if (k >= 0) push_cigar(cigar, 4, k + 1); // add soft clipping
+	if (is_local){
+		if (k >= 0){
+      // add soft clipping
+      push_cigar(cigar, 4, k + 1);
+    }
 		start_i = i + 1;
-	} else { // add the first insertion or deletion
-		if (i >= 0) push_cigar(cigar, 2, i + 1);
-		if (k >= 0) push_cigar(cigar, 1, k + 1);
+	} else {
+    // add the first insertion or deletion
+		if(i >= 0){
+      push_cigar(cigar, 2, i + 1);
+    }
+		if(k >= 0){
+      push_cigar(cigar, 1, k + 1);
+    }
 	}
-	for (var i = 0; i < cigar.length>>1; ++i) // reverse CIGAR
+	for(var i = 0; i < cigar.length>>1; ++i){
+    // reverse CIGAR
 		tmp = cigar[i], cigar[i] = cigar[cigar.length-1-i], cigar[cigar.length-1-i] = tmp;
+  }
 	return [score, start_i, cigar];
 }
 
-function bsa_cigar2gaps(target, query, start, cigar)
-{
+function bsa_cigar2gaps(target, query, start, cigar){
 	var oq = '', ot = '', lq = 0, lt = start;
-	for (var k = 0; k < cigar.length; ++k) {
+	for (var k = 0; k < cigar.length; ++k){
 		var op = cigar[k]&0xf, len = cigar[k]>>4;
-		if (op == 0) { // match
+		if (op == 0){
+      // match
 			oq += query.substr(lq, len);
 			ot += target.substr(lt, len);
 			lq += len, lt += len;
-		} else if (op == 1) { // insertion
+		} else if (op == 1){
+      // insertion
 			oq += query.substr(lq, len);
 			ot += Array(len+1).join("-");
 			lq += len;
-		} else if (op == 2) { // deletion
+		} else if (op == 2){
+      // deletion
 			oq += Array(len+1).join("-");
 			ot += target.substr(lt, len);
 			lt += len;
-		} else if (op == 4) { // soft clip
+		} else if (op == 4){
+      // soft clip
 			lq += len;
 		}
 	}
 	return [ot, oq];
 }
 
-function bsa_cigar2str(cigar)
-{
+function bsa_cigar2str(cigar){
 	var s = [];
-	for (var k = 0; k < cigar.length; ++k)
+	for (var k = 0; k < cigar.length; ++k){
 		s.push((cigar[k]>>4).toString() + "MIDNSHP=XB".charAt(cigar[k]&0xf));
+  }
 	return s.join("");
 }
+
+var bioseq = {
+  align: bsa_align,
+  gen_score_matrix: bsa_gen_score_matrix,
+  gen_query_profile: bsa_gen_query_profile,
+  cigar2str: bsa_cigar2str,
+  cigar2gaps: bsa_cigar2gaps
+};
+
+if(typeof exports !== 'undefined'){
+  if(typeof module !== 'undefined' && module.exports){
+    exports = module.exports = bioseq;
+  }
+  exports.bioseq = bioseq;
+} else {
+  window.bioseq = bioseq;
+}
+
+})();
