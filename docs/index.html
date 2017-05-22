@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>bioseq.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>bioseq.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">
+'use strict'</span>;
+
+(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>The following implementation is ported from klib/ksw.c. The original C
+implementation has a few bugs which have been fixed here. Like the C
+version, this implementation should be very efficient. It could be made more
+efficient if we use typed integer arrays such as Uint8Array. In addition,
+I mixed the local and global alignments together. For performance,
+it would be preferred to separate them out.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+  <span class="hljs-keyword">var</span> bioseq = {};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Common data tables</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+  bioseq.nt5 = [
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+
+    <span class="hljs-number">4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>, <span class="hljs-number">1</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>, <span class="hljs-number">1</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>
+  ];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h2 id="generic-routines">Generic routines</h2>
+<p>Encode a sequence string with table</p>
+<p>@param seq    sequence
+@param table  encoding table; must be of size 256</p>
+<p>@return an integer array</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  bioseq.bsg_enc_seq = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">seq, table</span>)</span>{
+    <span class="hljs-keyword">if</span>(table == <span class="hljs-literal">null</span>) table = bioseq.nt5;
+    <span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(seq.length);
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; seq.length; ++i){
+      s[i] = table[seq.charCodeAt(i)];
+    }
+    <span class="hljs-keyword">return</span> s;
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h2 id="pairwise-alignment">Pairwise Alignment</h2>
+<p>The following implements local and global pairwise alignment with affine gap
+penalties. There are two formulations: the Durbin formulation as is
+described in his book and the Green formulation as is implemented in phrap.
+The Durbin formulation is easier to understand, while the Green formulation
+is simpler to code and probably faster in practice.</p>
+<p>The Durbin formulation is:</p>
+<p>   M(i,j) = max{M(i-1,j-1)+S(i,j), E(i-1,j-1), F(i-1,j-1)}</p>
+<p>   E(i,j) = max{M(i-1,j)-q-r, F(i-1,j)-q-r, E(i-1,j)-r}</p>
+<p>   F(i,j) = max{M(i,j-1)-q-r, F(i,j-1)-r, E(i,j-1)-q-r}</p>
+<p>where q is the gap open penalty, r the gap extension penalty and S(i,j) is
+the score between the i-th residue in the row sequence and the j-th residue
+in the column sequence. Note that the original Durbin formulation disallows
+transitions between between E and F states, but we allow them here.</p>
+<p>In the Green formulation, we introduce:</p>
+<p>   H(i,j) = max{M(i,j), E(i,j), F(i,j)}</p>
+<p>The recursion becomes:</p>
+<p>   H(i,j) = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}</p>
+<p>   E(i,j) = max{H(i-1,j)-q, E(i-1,j)} - r</p>
+<p>   F(i,j) = max{H(i,j-1)-q, F(i,j-1)} - r</p>
+<p>It is in fact equivalent to the Durbin formulation. In implementation, we
+calculate the scores in a different order:</p>
+<p>   H(i,j)   = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}</p>
+<p>   E(i+1,j) = max{H(i,j)-q, E(i,j)} - r</p>
+<p>   F(i,j+1) = max{H(i,j)-q, F(i,j)} - r</p>
+<p>i.e. at cell (i,j), we compute E for the next row and F for the next column.
+Please see inline comments below for details.</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Local or global pairwise alignemnt</p>
+<p>@param is_local  perform local alignment
+@param target    target string
+@param query     query string or query profile
+@param matrix    square score matrix or [match,mismatch] array
+@param gapsc     [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext</p>
+<p>@param w         bandwidth, disabled by default
+@param table     encoding table. It defaults to bioseq.nt5.</p>
+<p>@return [score,target_start,cigar]. cigar is encoded in the BAM way, where
+higher 28 bits keeps the length and lower 4 bits the operation in order of
+“MIDNSH”. See cigar2str() for converting cigar to string.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  bioseq.align = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">is_local, target, query, matrix, gapsc, w, table</span>)</span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>convert bases to integers</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span>(table == <span class="hljs-literal">null</span>) table = bioseq.nt5;
+    <span class="hljs-keyword">var</span> t = bioseq.bsg_enc_seq(target, table);
+    <span class="hljs-keyword">var</span> qp = bioseq.gen_query_profile(query, matrix, table);
+    <span class="hljs-keyword">var</span> qlen = qp[<span class="hljs-number">0</span>].length;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>adjust band width</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> max_len = qlen &gt; t.length ? qlen : t.length;
+    w = w == <span class="hljs-literal">null</span> || w &lt; <span class="hljs-number">0</span> ? max_len : w;
+    <span class="hljs-keyword">var</span> len_diff = t.target &gt; qlen ? t.target - qlen : qlen - t.target;
+    w = w &gt; len_diff ? w : len_diff;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>set gap score
+these are penalties which should be non-negative</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> gapo, gape;
+    <span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> gapsc == <span class="hljs-string">'number'</span>){
+      gapo = <span class="hljs-number">0</span>;
+      gape = gapsc &gt; <span class="hljs-number">0</span> ? gapsc : -gapsc;
+    } <span class="hljs-keyword">else</span> {
+      gapo = gapsc[<span class="hljs-number">0</span>] &gt; <span class="hljs-number">0</span> ? gapsc[<span class="hljs-number">0</span>] : -gapsc[<span class="hljs-number">0</span>];
+      gape = gapsc[<span class="hljs-number">1</span>] &gt; <span class="hljs-number">0</span> ? gapsc[<span class="hljs-number">1</span>] : -gapsc[<span class="hljs-number">1</span>];
+    }
+    <span class="hljs-keyword">var</span> gapoe = gapo + gape; <span class="hljs-comment">// penalty for opening the first gap</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>initial values</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> H = [], E = [], z = [], score, max = <span class="hljs-number">0</span>, end_i = <span class="hljs-number">-1</span>, end_j = <span class="hljs-number">-1</span>;
+    <span class="hljs-keyword">if</span>(is_local){
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>; j &lt;= qlen; ++j){
+        H[j] = E[j] = <span class="hljs-number">0</span>;
+      }
+    } <span class="hljs-keyword">else</span> {
+      H[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span>; E[<span class="hljs-number">0</span>] = -gapoe - gapoe;
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j = <span class="hljs-number">1</span>; j &lt;= qlen; ++j){
+        <span class="hljs-keyword">if</span>(j &gt;= w){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>everything is -inf outside the band</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          H[j] = E[j] = <span class="hljs-built_in">Number</span>.NEGATIVE_INFINITY;
+        } <span class="hljs-keyword">else</span> {
+          H[j] = -(gapo + gape * j), E[j] = E[j<span class="hljs-number">-1</span>] - gape;
+        }
+      }
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>the DP loop</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; t.length; ++i){
+      <span class="hljs-keyword">var</span> h1 = <span class="hljs-number">0</span>, f = <span class="hljs-number">0</span>, m = <span class="hljs-number">0</span>, mj = <span class="hljs-number">-1</span>;
+      <span class="hljs-keyword">var</span> zi, qpi = qp[t[i]];
+      zi = z[i] = [];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>only loop through [beg,end) of the query sequence</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> beg = i &gt; w ? i - w : <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">var</span> end = i + w + <span class="hljs-number">1</span> &lt; qlen ? i + w + <span class="hljs-number">1</span> : qlen;
+      <span class="hljs-keyword">if</span>(!is_local){
+        h1 = beg &gt; <span class="hljs-number">0</span> ? <span class="hljs-built_in">Number</span>.NEGATIVE_INFINITY : -gapoe - gape * i;
+        f = beg &gt; <span class="hljs-number">0</span> ? <span class="hljs-built_in">Number</span>.NEGATIVE_INFINITY : -gapoe - gapoe - gape * i;
+      }
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j = beg; j &lt; end; ++j){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>At the beginning of the loop: h=H[j]=H(i-1,j-1), e=E[j]=E(i,j), f=F(i,j) and h1=H(i,j-1)
+If we only want to compute the max score, delete all lines involving direction “d”.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> e = E[j], h = H[j], d;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>set H(i,j-1) for the next row</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        H[j] = h1;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>h = H(i-1,j-1) + S(i,j)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        h += qpi[j];
+        d = h &gt; e ? <span class="hljs-number">0</span> : <span class="hljs-number">1</span>;
+        h = h &gt; e ? h : e;
+        d = h &gt; f ? d : <span class="hljs-number">2</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>h = H(i,j) = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        h = h &gt; f ? h : f;
+        d = !is_local || h &gt; <span class="hljs-number">0</span> ? d : <span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">6</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>save H(i,j) to h1 for the next column</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        h1 = h;
+        mj = m &gt; h ? mj : j;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>update the max score in this row</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        m = m &gt; h ? m : h;
+        h -= gapoe;
+        h = !is_local || h &gt; <span class="hljs-number">0</span> ? h : <span class="hljs-number">0</span>;
+        e -= gape;
+        d |= e &gt; h ? <span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">2</span> : <span class="hljs-number">0</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>e = E(i+1,j)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        e = e &gt; h ? e : h;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>save E(i+1,j) for the next row</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        E[j] = e;
+        f -= gape;
+        d |= f &gt; h ? <span class="hljs-number">2</span>&lt;&lt;<span class="hljs-number">4</span> : <span class="hljs-number">0</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>f = F(i,j+1)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        f = f &gt; h ? f : h;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>z[i,j] keeps h for the current cell and e/f for the next cell</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        zi[j] = d;
+      }
+      H[end] = h1, E[end] = is_local ? <span class="hljs-number">0</span> : <span class="hljs-built_in">Number</span>.NEGATIVE_INFINITY;
+      <span class="hljs-keyword">if</span>(m &gt; max){
+        max = m;
+        end_i = i;
+        end_j = mj;
+      }
+    }
+    <span class="hljs-keyword">if</span>(is_local &amp;&amp; max == <span class="hljs-number">0</span>){
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+    }
+    score = is_local ? max : H[qlen];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>backtrack to recover the alignment/cigar</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">push_cigar</span>(<span class="hljs-params">ci, op, len</span>)</span>{
+      <span class="hljs-keyword">if</span>(ci.length == <span class="hljs-number">0</span> || op != (ci[ci.length<span class="hljs-number">-1</span>]&amp;<span class="hljs-number">0xf</span>))
+        ci.push(len&lt;&lt;<span class="hljs-number">4</span>|op);
+      <span class="hljs-keyword">else</span> ci[ci.length<span class="hljs-number">-1</span>] += len&lt;&lt;<span class="hljs-number">4</span>;
+    }
+
+    <span class="hljs-keyword">var</span> cigar = [], tmp, which = <span class="hljs-number">0</span>, i, k, start_i = <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">if</span>(is_local){
+      i = end_i, k = end_j;
+      <span class="hljs-keyword">if</span>(end_j != qlen - <span class="hljs-number">1</span>){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>then add soft cliping</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        push_cigar(cigar, <span class="hljs-number">4</span>, qlen - <span class="hljs-number">1</span> - end_j);
+      }
+    } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>(i,k) points to the last cell</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      i = t.length - <span class="hljs-number">1</span>;
+      k = (i + w + <span class="hljs-number">1</span> &lt; qlen ? i + w + <span class="hljs-number">1</span> : qlen) - <span class="hljs-number">1</span>;
+    }
+
+    <span class="hljs-keyword">while</span>(i &gt;= <span class="hljs-number">0</span> &amp;&amp; k &gt;= <span class="hljs-number">0</span>){
+      tmp = z[i][k - (i &gt; w ? i - w : <span class="hljs-number">0</span>)];
+      which = tmp &gt;&gt; (which &lt;&lt; <span class="hljs-number">1</span>) &amp; <span class="hljs-number">3</span>;
+      <span class="hljs-keyword">if</span>(which == <span class="hljs-number">0</span> &amp;&amp; tmp&gt;&gt;<span class="hljs-number">6</span>){
+        <span class="hljs-keyword">break</span>;
+      }
+      <span class="hljs-keyword">if</span>(which == <span class="hljs-number">0</span>){
+        which = tmp &amp; <span class="hljs-number">3</span>;
+      }
+      <span class="hljs-keyword">if</span>(which == <span class="hljs-number">0</span>){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>match</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        push_cigar(cigar, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>); --i, --k;
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(which == <span class="hljs-number">1</span>){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>deletion</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        push_cigar(cigar, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>); --i;
+      }  <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>insertion</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        push_cigar(cigar, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>), --k;
+      }
+    }
+    <span class="hljs-keyword">if</span>(is_local){
+      <span class="hljs-keyword">if</span>(k &gt;= <span class="hljs-number">0</span>){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>add soft clipping</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        push_cigar(cigar, <span class="hljs-number">4</span>, k + <span class="hljs-number">1</span>);
+      }
+      start_i = i + <span class="hljs-number">1</span>;
+    } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>add the first insertion or deletion</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span>(i &gt;= <span class="hljs-number">0</span>){
+        push_cigar(cigar, <span class="hljs-number">2</span>, i + <span class="hljs-number">1</span>);
+      }
+      <span class="hljs-keyword">if</span>(k &gt;= <span class="hljs-number">0</span>){
+        push_cigar(cigar, <span class="hljs-number">1</span>, k + <span class="hljs-number">1</span>);
+      }
+    }
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; cigar.length&gt;&gt;<span class="hljs-number">1</span>; ++i){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>reverse CIGAR</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      tmp = cigar[i];
+      cigar[i] = cigar[cigar.length<span class="hljs-number">-1</span>-i], cigar[cigar.length<span class="hljs-number">-1</span>-i] = tmp;
+    }
+    <span class="hljs-keyword">return</span> [score, start_i, cigar];
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <h2 id="generate-scoring-matrix-from-match-mismatch-score">Generate scoring matrix from match/mismatch score</h2>
+<p>@param n     size of the alphabet
+@param a     match score, positive
+@param b     mismatch score, negative</p>
+<p>@return sqaure scoring matrix. The last row and column are zero, for
+matching an ambiguous residue.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  bioseq.gen_score_matrix = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">n, a, b</span>)</span>{
+    <span class="hljs-keyword">var</span> m = [];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>mismatch score b should be non-positive</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span>(b &gt; <span class="hljs-number">0</span>){
+      b = -b;
+    }
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; n - <span class="hljs-number">1</span>; ++i){
+      m[i] = [];
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>; j &lt; n - <span class="hljs-number">1</span>; ++j){
+        m[i][j] = i == j ? a : b;
+      }
+      m[i][j] = <span class="hljs-number">0</span>;
+    }
+    m[n<span class="hljs-number">-1</span>] = [];
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>; j &lt; n; ++j){
+      m[n<span class="hljs-number">-1</span>][j] = <span class="hljs-number">0</span>;
+    }
+    <span class="hljs-keyword">return</span> m;
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>Generate query profile (a preprocessing step)</p>
+<p>@param _s      sequence in string or post bsg_enc_seq()
+@param _m      score matrix or [match,mismatch] array
+@param table   encoding table; must be consistent with _s and _m</p>
+<p>@return query profile. It is a two-dimensional integer matrix.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  bioseq.gen_query_profile = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">_s, _m, table</span>)</span>{
+    <span class="hljs-keyword">var</span> s = <span class="hljs-keyword">typeof</span> _s == <span class="hljs-string">'string'</span> ? bioseq.bsg_enc_seq(_s, table) : _s;
+    <span class="hljs-keyword">var</span> qp = [], matrix;
+    <span class="hljs-keyword">if</span>(_m.length &gt;= <span class="hljs-number">2</span> &amp;&amp; <span class="hljs-keyword">typeof</span> _m[<span class="hljs-number">0</span>] == <span class="hljs-string">'number'</span> &amp;&amp; <span class="hljs-keyword">typeof</span> _m[<span class="hljs-number">1</span>] == <span class="hljs-string">'number'</span>){ <span class="hljs-comment">// match/mismatch score</span>
+      <span class="hljs-keyword">if</span>(table == <span class="hljs-literal">null</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+      <span class="hljs-keyword">var</span> n = <span class="hljs-keyword">typeof</span> table == <span class="hljs-string">'number'</span> ? table : table[table.length<span class="hljs-number">-1</span>] + <span class="hljs-number">1</span>;
+      matrix = bioseq.gen_score_matrix(n, _m[<span class="hljs-number">0</span>], _m[<span class="hljs-number">1</span>]);
+    } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>TODO: check if _m is already a matrix!
+TODO: check if it is really a square matrix!</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      matrix = _m;
+    }
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>; j &lt; matrix.length; ++j){
+      <span class="hljs-keyword">var</span> qpj, mj = matrix[j];
+      qpj = qp[j] = [];
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; s.length; ++i){
+        qpj[i] = mj[s[i]];
+      }
+    }
+    <span class="hljs-keyword">return</span> qp;
+  };
+
+  bioseq.cigar2gaps = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">target, query, start, cigar</span>)</span>{
+    <span class="hljs-keyword">var</span> oq = <span class="hljs-string">''</span>, ot = <span class="hljs-string">''</span>, lq = <span class="hljs-number">0</span>, lt = start;
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> k = <span class="hljs-number">0</span>; k &lt; cigar.length; ++k){
+      <span class="hljs-keyword">var</span> op = cigar[k]&amp;<span class="hljs-number">0xf</span>, len = cigar[k]&gt;&gt;<span class="hljs-number">4</span>;
+      <span class="hljs-keyword">if</span>(op == <span class="hljs-number">0</span>){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>match</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        oq += query.substr(lq, len);
+        ot += target.substr(lt, len);
+        lq += len, lt += len;
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(op == <span class="hljs-number">1</span>){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>insertion</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        oq += query.substr(lq, len);
+        ot += <span class="hljs-built_in">Array</span>(len+<span class="hljs-number">1</span>).join(<span class="hljs-string">"-"</span>);
+        lq += len;
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(op == <span class="hljs-number">2</span>){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p>deletion</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        oq += <span class="hljs-built_in">Array</span>(len+<span class="hljs-number">1</span>).join(<span class="hljs-string">"-"</span>);
+        ot += target.substr(lt, len);
+        lt += len;
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(op == <span class="hljs-number">4</span>){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p>soft clip</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        lq += len;
+      }
+    }
+    <span class="hljs-keyword">return</span> [ot, oq];
+  };
+
+  bioseq.cigar2str = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">cigar</span>)</span>{
+    <span class="hljs-keyword">var</span> s = [];
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> k = <span class="hljs-number">0</span>; k &lt; cigar.length; ++k){
+      s.push((cigar[k]&gt;&gt;<span class="hljs-number">4</span>).toString() + <span class="hljs-string">"MIDNSHP=XB"</span>.charAt(cigar[k]&amp;<span class="hljs-number">0xf</span>));
+    }
+    <span class="hljs-keyword">return</span> s.join();
+  };
+
+  <span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> exports !== <span class="hljs-string">'undefined'</span>){
+    <span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">module</span> !== <span class="hljs-string">'undefined'</span> &amp;&amp; <span class="hljs-built_in">module</span>.exports){
+      exports = <span class="hljs-built_in">module</span>.exports = bioseq;
+    }
+    exports.bioseq = bioseq;
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-built_in">window</span>.bioseq = bioseq;
+  }
+
+})();</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

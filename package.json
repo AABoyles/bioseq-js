@@ -4,7 +4,8 @@
   "description": "A fast, lightweight implementation of Smith-Waterman",
   "main": "bioseq.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docco": "docco bioseq.js && mv docs/bioseq.html docs/index.html"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/AABoyles/bioseq-js/issues"
   },
-  "homepage": "https://github.com/AABoyles/bioseq-js#readme"
+  "homepage": "https://github.com/AABoyles/bioseq-js#readme",
+  "devDependencies": {
+    "docco": "^0.7.0"
+  }
 }
