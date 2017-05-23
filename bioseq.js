@@ -15,34 +15,34 @@
    // Common data tables
 
   bioseq.nt5 = [
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
 
-    4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 0, 4, 1,   4, 4, 4, 2,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   3, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 0, 4, 1,   4, 4, 4, 2,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   3, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
 
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
 
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
-    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4
   ];
 
   //## Generic routines
   // Encode a sequence string with table
   //
-  // @param seq    sequence
-  // @param table  encoding table; must be of size 256
+  // seq    sequence
+  // table  encoding table; must be of size 256
   //
-  // @return an integer array
+  // Returns an integer array
   bioseq.bsg_enc_seq = function(seq, table){
     if(table == null) table = bioseq.nt5;
     var s = new Array(seq.length);
@@ -52,67 +52,28 @@
     return s;
   }
 
-  //## Pairwise Alignment
-  // The following implements local and global pairwise alignment with affine gap
-  // penalties. There are two formulations: the Durbin formulation as is
-  // described in his book and the Green formulation as is implemented in phrap.
-  // The Durbin formulation is easier to understand, while the Green formulation
-  // is simpler to code and probably faster in practice.
-  //
-  // The Durbin formulation is:
-  //
-  //    M(i,j) = max{M(i-1,j-1)+S(i,j), E(i-1,j-1), F(i-1,j-1)}
-  //
-  //    E(i,j) = max{M(i-1,j)-q-r, F(i-1,j)-q-r, E(i-1,j)-r}
-  //
-  //    F(i,j) = max{M(i,j-1)-q-r, F(i,j-1)-r, E(i,j-1)-q-r}
-  //
-  // where q is the gap open penalty, r the gap extension penalty and S(i,j) is
-  // the score between the i-th residue in the row sequence and the j-th residue
-  // in the column sequence. Note that the original Durbin formulation disallows
-  // transitions between between E and F states, but we allow them here.
-  //
-  // In the Green formulation, we introduce:
-  //
-  //    H(i,j) = max{M(i,j), E(i,j), F(i,j)}
-  //
-  // The recursion becomes:
-  //
-  //    H(i,j) = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}
-  //
-  //    E(i,j) = max{H(i-1,j)-q, E(i-1,j)} - r
-  //
-  //    F(i,j) = max{H(i,j-1)-q, F(i,j-1)} - r
-  //
-  // It is in fact equivalent to the Durbin formulation. In implementation, we
-  // calculate the scores in a different order:
-  //
-  //    H(i,j)   = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}
-  //
-  //    E(i+1,j) = max{H(i,j)-q, E(i,j)} - r
-  //
-  //    F(i,j+1) = max{H(i,j)-q, F(i,j)} - r
-  //
-  // i.e. at cell (i,j), we compute E for the next row and F for the next column.
-  // Please see inline comments below for details.
-
   // Local or global pairwise alignemnt
   //
-  // @param is_local  perform local alignment
-  // @param target    target string
-  // @param query     query string or query profile
-  // @param matrix    square score matrix or [match,mismatch] array
-  // @param gapsc     [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext
+  // *target*  target string
+  // *query*   query string or query profile
+	// is_local  perform local alignment
+  // matrix    square score matrix or [match,mismatch] array
+  // gapsc     [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext
+  // w         bandwidth, disabled by default
+  // table     encoding table. It defaults to bioseq.nt5.
   //
-  // @param w         bandwidth, disabled by default
-  // @param table     encoding table. It defaults to bioseq.nt5.
-  //
-  // @return [score,target_start,cigar]. cigar is encoded in the BAM way, where
-  // higher 28 bits keeps the length and lower 4 bits the operation in order of
-  // "MIDNSH". See cigar2str() for converting cigar to string.
-  bioseq.align = function(is_local, target, query, matrix, gapsc, w, table){
+  // Returns {score, target_start, cigar}. cigar is encoded in the BAM way,
+	// where higher 28 bits keeps the length and lower 4 bits the operation in
+	// order of "MIDNSH". See bioseq.cigar2str() for converting cigar to string.
+  bioseq.align = function(target, query, is_local, matrix, gapsc, w, table){
+		// Set some defaults:
+		if(typeof is_local === 'undefined') is_local = true;
+		if(typeof matrix === 'undefined') matrix = [1, -1];
+		if(typeof gapsc === 'undefined') gapsc = [-1, -1];
+		//w is defaulted below...
+		if(table == null) table = bioseq.nt5;
+
     // convert bases to integers
-    if(table == null) table = bioseq.nt5;
     var t = bioseq.bsg_enc_seq(target, table);
     var qp = bioseq.gen_query_profile(query, matrix, table);
     var qlen = qp[0].length;
@@ -272,16 +233,16 @@
       tmp = cigar[i];
       cigar[i] = cigar[cigar.length-1-i], cigar[cigar.length-1-i] = tmp;
     }
-    return [score, start_i, cigar];
+    return {'score': score, 'position': start_i, 'CIGAR': cigar};
   }
 
   //## Generate scoring matrix from match/mismatch score
   //
-  // @param n     size of the alphabet
-  // @param a     match score, positive
-  // @param b     mismatch score, negative
+  // n     size of the alphabet
+  // a     match score, positive
+  // b     mismatch score, negative
   //
-  // @return sqaure scoring matrix. The last row and column are zero, for
+  // Returns a sqaure scoring matrix. The last row and column are zero, for
   // matching an ambiguous residue.
   bioseq.gen_score_matrix = function(n, a, b){
     var m = [];
@@ -305,11 +266,11 @@
 
   // Generate query profile (a preprocessing step)
   //
-  // @param _s      sequence in string or post bsg_enc_seq()
-  // @param _m      score matrix or [match,mismatch] array
-  // @param table   encoding table; must be consistent with _s and _m
+  // _s      sequence in string or post bsg_enc_seq()
+  // _m      score matrix or [match,mismatch] array
+  // table   encoding table; must be consistent with _s and _m
   //
-  // @return query profile. It is a two-dimensional integer matrix.
+  // Returns a query profile. It is a two-dimensional integer matrix.
   bioseq.gen_query_profile = function(_s, _m, table){
     var s = typeof _s == 'string' ? bioseq.bsg_enc_seq(_s, table) : _s;
     var qp = [], matrix;
