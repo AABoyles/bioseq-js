@@ -5,43 +5,33 @@
 
   var bioseq = {};
 
-   // Common data tables
+  bioseq.makeIntArray = function(length, bitSize, fill){
+    var a = bitSize <= 16 ? new Int16Array(length) : new Int32Array(length);
+    var b = bitSize <= 8  ? new Int8Array( length) : a;
+    var cani8 = typeof Int8Array !== 'undefined';
+    var arr = cani8 ? b : [];
+    if(!cani8 || (fill !== 0 && fill !== undefined)){
+      for(var n = 0; n < length; n++){
+        arr[n] = fill;
+      }
+    }
+    return arr;
+  };
 
-  bioseq.nt5 = [
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+  bioseq.makeAlphabetMap = function(str, defaultVal){
+    var aMap = bioseq.makeIntArray(256, 8, defaultVal);
+    var lstr = str.toLowerCase();
+    for (var n = 0; n < str.length; n++) {
+      aMap[ str.charCodeAt(n)] = n;
+      aMap[lstr.charCodeAt(n)] = n;
+    }
+    return aMap;
+  }
 
-    4, 0, 4, 1,   4, 4, 4, 2,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   3, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 0, 4, 1,   4, 4, 4, 2,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   3, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
+  bioseq.nt5 = bioseq.makeAlphabetMap('ACGT', 4);
+  bioseq.nac = bioseq.makeAlphabetMap('ACGTURYMKWSBDHVN', 16);
+  bioseq.aac = bioseq.makeAlphabetMap('ARNDCQEGHILKMFPSTWYVBZX', 32);
 
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,
-    4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4
-  ];
-
-  // Local or global pairwise alignemnt
-  //
-  // * *target* - target string
-  // * *query*  - query string or query profile
-	// * is_local - perform local alignment
-  // * matrix   - square score matrix or [match,mismatch] array
-  // * gapsc    - [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext
-  // * w        - bandwidth, disabled by default
-  // * table    - encoding table. It defaults to bioseq.nt5.
-  //
-  // Returns {score, target_start, cigar}. cigar is encoded in the BAM way,
-	// where higher 28 bits keeps the length and lower 4 bits the operation in
-	// order of "MIDNSH". See bioseq.cigar2str() for converting cigar to string.
   bioseq.align = function(target, query, is_local, matrix, gapsc, w, table){
 		// Set some defaults:
 		if(typeof is_local === 'undefined') is_local = true;
@@ -105,7 +95,7 @@
       }
       for(var j = beg; j < end; ++j){
         // At the beginning of the loop: h=H[j]=H(i-1,j-1), e=E[j]=E(i,j), f=F(i,j) and h1=H(i,j-1)
-        // If we only want to compute the max score, delete all lines involving direction "d".
+        // If we only want to compute the max score, delete all lines involving direction 'd'.
         var e = E[j], h = H[j], d;
         // set H(i,j-1) for the next row
         H[j] = h1;
@@ -289,7 +279,7 @@
   bioseq.cigar2str = function(cigar){
     var s = [];
     for(var k = 0; k < cigar.length; ++k){
-      s.push((cigar[k]>>4).toString() + "MIDNSHP=XB".charAt(cigar[k]&0xf));
+      s.push((cigar[k]>>4).toString() + 'MIDNSHP=XB'.charAt(cigar[k]&0xf));
     }
     return s.join();
   };
@@ -306,11 +296,11 @@
       } else if(op == 1){
         // insertion
         oq += query.substr(lq, len);
-        ot += Array(len+1).join("-");
+        ot += Array(len+1).join('-');
         lq += len;
       } else if(op == 2){
         // deletion
-        oq += Array(len+1).join("-");
+        oq += Array(len+1).join('-');
         ot += target.substr(lt, len);
         lt += len;
       } else if(op == 4){

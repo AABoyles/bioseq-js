@@ -1,6 +1,8 @@
-# bioseq
-
 ## Use
+
+### Demo
+
+[Click here to try it out.](http://aaboyles.github.io/bioseq-js/demo/)
 
 ### Installation
 
@@ -12,11 +14,17 @@ your project directory,
 npm install bioseq --save
 ```
 
+From there, you can require it wherever is convenient:
+
+```javascript
+const bioseq = require('bioseq');
+```
+
 Alternately, if you just want it in the browser, [download it](https://github.com/AABoyles/bioseq-js/archive/master.zip)
 and include it with a script tag, like so:
 
 ```html
-<script src="bioseq"></script>
+<script src="bioseq.js"></script>
 ```
 ### Quick Start Example
 
@@ -40,30 +48,32 @@ For a more comprehensive example, view the source of [demo/index.html](https://g
 
 ### API
 
-bioseq is an object with the following contents:
-
-* align - The main function.
-* cigar2gaps -
-* cigar2str -
-* bsg_enc_seq -
-* gen_query_profile -
-* gen_score_matrix -
-* nt5 - An array of length 256, which is treated as a default encoding table.
+bioseq is an object with the following functions: align, cigar2gaps, cigar2str,
+bsg_enc_seq, gen_query_profile, gen_score_matrix, makeAlphabetMap, and
+makeIntArray.
 
 In general, the only functions of general interest are `align` and `cigar2*`,
 so let's talk about those.
 
 #### bioseq.align
 
-align is the most important function in bioseq. It accepts seven parameters:
+`align` is the fundamental function of `bioseq`. It accepts seven parameters:
 
-* isLocal - A boolean variable indicating whether this is a local alignment (passing false results in a global alignment)
-* target - A literal string sequence of nucleotide letters representing the super-segment of DNA to which the other sequence is to be aligned.
-* query - A literal string sequence of nucleotide letters representing the segment of DNA which is to be aligned to `target`.
-* matrix - square score matrix or [match, mismatch] array
-* gapsc - [gap_open, gap_ext] array; k-length gap costs gap_open + gap_ext
-* w - bandwidth, disabled by default
-* table - encoding table. It defaults to bioseq.nt5.
+* *target* - target string
+* *query*  - query string or query profile
+
+And, optionally:
+
+* is_local - perform local alignment
+* matrix   - square score matrix or [match,mismatch] array
+* gapsc    - [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext
+* w        - bandwidth, disabled by default
+* table    - encoding table. It defaults to bioseq.nt5.
+
+Returns an object containing a `score`, `position`, and `CIGAR`. CIGAR is
+encoded in the BAM way, where higher 28 bits keeps the length and lower 4 bits
+the operation in order of 'MIDNSH'. See `bioseq.cigar2str()` for converting
+CIGAR to string.
 
 #### bioseq.cigar2str
 
@@ -72,9 +82,12 @@ CIGAR is an encoding scheme for sequence alignment instructions. Basically,
 it's a list of instructions to make two sequences line up. These instructions
 are assembled from a very simple set:
 
+* M for match
 * I for insertion
 * D for deletion
-* M for match
+* N for gap
+* S for substitution
+* H for hard clipping
 
 Each of these can be preceded by an integer, indicating the number of base pairs
 for which this instruction is correct between the two sequences. However, CIGARs

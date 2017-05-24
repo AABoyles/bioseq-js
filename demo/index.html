@@ -34,8 +34,9 @@
 		}
 		#output{
 			width: calc(100% - 100px);
-			height: calc(100% - 40px);
 			margin: 20px 50px;
+			overflow-x: scroll;
+			background: #fff;
 		}
 	</style>
 </head>
@@ -60,7 +61,7 @@
 		<textarea id="s2" placeholder="Query sequence"></textarea>
 	</div>
 	<footer>
-		<textarea id="output"></textarea>
+		<pre id="output"></pre>
 	</footer>
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="../bioseq.js"></script>
@@ -81,17 +82,8 @@
 			var gape = parseInt($('#gape').val());
 			var is_local = $('#is_local').is(':checked');
 			var rst = bioseq.align(target, query, is_local, [ms, mms], [gapo, gape]);
-			var str = 'starting position: ' + rst.position + '\n' + 'alignment:\n\n';
 			var fmt = bioseq.cigar2gaps(target, query, rst.position, rst.CIGAR);
-
-			// This odd business just formats the sequences to approximately fit in the
-			// available space. fmt[0] and fmt[1] are the aligned sequences.
-			var linelen = $('#output').width()/8;
-			for (var l = 0; l < fmt[0].length; l += linelen){
-				str += fmt[0].substr(l, linelen) + '\n';
-				str += fmt[1].substr(l, linelen) + '\n\n';
-			}
-			$('#output').val(str);
+			$('#output').text(fmt[0] + '\n' + fmt[1]);
 
 			var elapse = (new Date().getTime() - time_start) / 1000.0;
 			$('#runtime').html("in " + elapse.toFixed(3) + "s");
