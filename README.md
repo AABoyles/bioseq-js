@@ -24,28 +24,28 @@ and include it with a script tag, like so:
 var target = 'ATAGCTAGCTAGCATAAGC';
 var query  = 'AGCTAcCGCAT';
 
-var isLocal = true, match = 1, mis = -1, gapOpen = -1, gapExt = -1;
+var rst = bioseq.align(target, query);
 
-var rst = bioseq.align(target, query, isLocal, [match,mis], [gapOpen,gapExt]);
+console.log('Score: ', rst.score);
+console.log('Starting position: ', rst.position);
+console.log('CIGAR: ', bioseq.cigar2str(rst.CIGAR));
 
-console.log('Score: ', rst[0]);
-console.log('Starting position: ', rst[1]);
-console.log('CIGAR: ', bioseq.cigar2str(rst[2]));
-
-var fmt = bioseq.cigar2gaps(target, query, rst[1], rst[2]);
+var fmt = bioseq.cigar2gaps(target, query, rst.position, rst.CIGAR);
 
 console.log(fmt[0]);
 console.log(fmt[1]);
 ```
+
+For a more comprehensive example, view the source of [demo/index.html](https://github.com/AABoyles/bioseq-js/blob/master/demo/index.html#L67)
 
 ### API
 
 bioseq is an object with the following contents:
 
 * align - The main function.
-* bsg_enc_seq -
 * cigar2gaps -
 * cigar2str -
+* bsg_enc_seq -
 * gen_query_profile -
 * gen_score_matrix -
 * nt5 - An array of length 256, which is treated as a default encoding table.
@@ -65,7 +65,26 @@ align is the most important function in bioseq. It accepts seven parameters:
 * w - bandwidth, disabled by default
 * table - encoding table. It defaults to bioseq.nt5.
 
-http://genome.sph.umich.edu/wiki/SAM#What_is_a_CIGAR.3F
+#### bioseq.cigar2str
+
+Before I get in to what this function does, let's talk about what it needs.
+CIGAR is an encoding scheme for sequence alignment instructions. Basically,
+it's a list of instructions to make two sequences line up. These instructions
+are assembled from a very simple set:
+
+* I for insertion
+* D for deletion
+* M for match
+
+Each of these can be preceded by an integer, indicating the number of base pairs
+for which this instruction is correct between the two sequences. However, CIGARs
+are stored as simpler machine instructions, rather than strings. So, if you
+want to show the CIGAR (for some reason), you're going to need this.
+
+#### bioseq.cigar2gaps
+
+Takes a pair of sequences and a CIGAR and returns an array of sequences which
+have been aligned according to the instructions in the CIGAR.
 
 ## Theory
 

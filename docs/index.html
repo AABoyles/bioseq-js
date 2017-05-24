@@ -33,7 +33,9 @@
             <div class="content"><div class='highlight'><pre><span class="hljs-meta">
 'use strict'</span>;
 
-(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{</pre></div></div>
+(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+
+  <span class="hljs-keyword">var</span> bioseq = {};</pre></div></div>
             
         </li>
         
@@ -44,17 +46,32 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>The following implementation is ported from klib/ksw.c. The original C
-implementation has a few bugs which have been fixed here. Like the C
-version, this implementation should be very efficient. It could be made more
-efficient if we use typed integer arrays such as Uint8Array. In addition,
-I mixed the local and global alignments together. For performance,
-it would be preferred to separate them out.</p>
+              <p>Common data tables</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>
-  <span class="hljs-keyword">var</span> bioseq = {};</pre></div></div>
+  bioseq.nt5 = [
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+
+    <span class="hljs-number">4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>, <span class="hljs-number">1</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>, <span class="hljs-number">1</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
+    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,   <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>
+  ];</pre></div></div>
             
         </li>
         
@@ -65,32 +82,23 @@ it would be preferred to separate them out.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Common data tables</p>
+              <p>Local or global pairwise alignemnt</p>
+<ul>
+<li><em>target</em> - target string</li>
+<li><em>query</em>  - query string or query profile</li>
+<li>is_local - perform local alignment</li>
+<li>matrix   - square score matrix or [match,mismatch] array</li>
+<li>gapsc    - [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext</li>
+<li>w        - bandwidth, disabled by default</li>
+<li>table    - encoding table. It defaults to bioseq.nt5.</li>
+</ul>
+<p>Returns {score, target_start, cigar}. cigar is encoded in the BAM way,
+where higher 28 bits keeps the length and lower 4 bits the operation in
+order of ‚ÄúMIDNSH‚Äù. See bioseq.cigar2str() for converting cigar to string.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-  bioseq.nt5 = [
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-
-    <span class="hljs-number">4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>, <span class="hljs-number">1</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>, <span class="hljs-number">1</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,
-    <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>,  <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>
-  ];</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  bioseq.align = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">target, query, is_local, matrix, gapsc, w, table</span>)</span>{</pre></div></div>
             
         </li>
         
@@ -101,22 +109,13 @@ it would be preferred to separate them out.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <h2 id="generic-routines">Generic routines</h2>
-<p>Encode a sequence string with table</p>
-<p>@param seq    sequence
-@param table  encoding table; must be of size 256</p>
-<p>@return an integer array</p>
+              <p>Set some defaults:</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  bioseq.bsg_enc_seq = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">seq, table</span>)</span>{
-    <span class="hljs-keyword">if</span>(table == <span class="hljs-literal">null</span>) table = bioseq.nt5;
-    <span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(seq.length);
-    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; seq.length; ++i){
-      s[i] = table[seq.charCodeAt(i)];
-    }
-    <span class="hljs-keyword">return</span> s;
-  }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> is_local === <span class="hljs-string">'undefined'</span>) is_local = <span class="hljs-literal">true</span>;
+		<span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> matrix === <span class="hljs-string">'undefined'</span>) matrix = [<span class="hljs-number">1</span>, <span class="hljs-number">-1</span>];
+		<span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> gapsc === <span class="hljs-string">'undefined'</span>) gapsc = [<span class="hljs-number">-1</span>, <span class="hljs-number">-1</span>];</pre></div></div>
             
         </li>
         
@@ -127,35 +126,11 @@ it would be preferred to separate them out.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h2 id="pairwise-alignment">Pairwise Alignment</h2>
-<p>The following implements local and global pairwise alignment with affine gap
-penalties. There are two formulations: the Durbin formulation as is
-described in his book and the Green formulation as is implemented in phrap.
-The Durbin formulation is easier to understand, while the Green formulation
-is simpler to code and probably faster in practice.</p>
-<p>The Durbin formulation is:</p>
-<p>   M(i,j) = max{M(i-1,j-1)+S(i,j), E(i-1,j-1), F(i-1,j-1)}</p>
-<p>   E(i,j) = max{M(i-1,j)-q-r, F(i-1,j)-q-r, E(i-1,j)-r}</p>
-<p>   F(i,j) = max{M(i,j-1)-q-r, F(i,j-1)-r, E(i,j-1)-q-r}</p>
-<p>where q is the gap open penalty, r the gap extension penalty and S(i,j) is
-the score between the i-th residue in the row sequence and the j-th residue
-in the column sequence. Note that the original Durbin formulation disallows
-transitions between between E and F states, but we allow them here.</p>
-<p>In the Green formulation, we introduce:</p>
-<p>   H(i,j) = max{M(i,j), E(i,j), F(i,j)}</p>
-<p>The recursion becomes:</p>
-<p>   H(i,j) = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}</p>
-<p>   E(i,j) = max{H(i-1,j)-q, E(i-1,j)} - r</p>
-<p>   F(i,j) = max{H(i,j-1)-q, F(i,j-1)} - r</p>
-<p>It is in fact equivalent to the Durbin formulation. In implementation, we
-calculate the scores in a different order:</p>
-<p>   H(i,j)   = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}</p>
-<p>   E(i+1,j) = max{H(i,j)-q, E(i,j)} - r</p>
-<p>   F(i,j+1) = max{H(i,j)-q, F(i,j)} - r</p>
-<p>i.e. at cell (i,j), we compute E for the next row and F for the next column.
-Please see inline comments below for details.</p>
+              <p>w is defaulted below‚Ä¶</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">if</span>(table == <span class="hljs-literal">null</span>) table = bioseq.nt5;</pre></div></div>
             
         </li>
         
@@ -166,21 +141,13 @@ Please see inline comments below for details.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Local or global pairwise alignemnt</p>
-<p>@param is_local  perform local alignment
-@param target    target string
-@param query     query string or query profile
-@param matrix    square score matrix or [match,mismatch] array
-@param gapsc     [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext</p>
-<p>@param w         bandwidth, disabled by default
-@param table     encoding table. It defaults to bioseq.nt5.</p>
-<p>@return [score,target_start,cigar]. cigar is encoded in the BAM way, where
-higher 28 bits keeps the length and lower 4 bits the operation in order of
-‚ÄúMIDNSH‚Äù. See cigar2str() for converting cigar to string.</p>
+              <p>convert bases to integers</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  bioseq.align = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">is_local, target, query, matrix, gapsc, w, table</span>)</span>{</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> t = bioseq.bsg_enc_seq(target, table);
+    <span class="hljs-keyword">var</span> qp = bioseq.gen_query_profile(query, matrix, table);
+    <span class="hljs-keyword">var</span> qlen = qp[<span class="hljs-number">0</span>].length;</pre></div></div>
             
         </li>
         
@@ -190,24 +157,6 @@ higher 28 bits keeps the length and lower 4 bits the operation in order of
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
-              </div>
-              <p>convert bases to integers</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span>(table == <span class="hljs-literal">null</span>) table = bioseq.nt5;
-    <span class="hljs-keyword">var</span> t = bioseq.bsg_enc_seq(target, table);
-    <span class="hljs-keyword">var</span> qp = bioseq.gen_query_profile(query, matrix, table);
-    <span class="hljs-keyword">var</span> qlen = qp[<span class="hljs-number">0</span>].length;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>adjust band width</p>
 
@@ -221,11 +170,11 @@ higher 28 bits keeps the length and lower 4 bits the operation in order of
         </li>
         
         
-        <li id="section-9">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>set gap score
 these are penalties which should be non-negative</p>
@@ -245,11 +194,11 @@ these are penalties which should be non-negative</p>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>initial values</p>
 
@@ -268,11 +217,11 @@ these are penalties which should be non-negative</p>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>everything is -inf outside the band</p>
 
@@ -288,11 +237,11 @@ these are penalties which should be non-negative</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>the DP loop</p>
 
@@ -306,11 +255,11 @@ these are penalties which should be non-negative</p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>only loop through [beg,end) of the query sequence</p>
 
@@ -327,11 +276,11 @@ these are penalties which should be non-negative</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>At the beginning of the loop: h=H[j]=H(i-1,j-1), e=E[j]=E(i,j), f=F(i,j) and h1=H(i,j-1)
 If we only want to compute the max score, delete all lines involving direction ‚Äúd‚Äù.</p>
@@ -343,11 +292,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-15">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>set H(i,j-1) for the next row</p>
 
@@ -358,11 +307,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-16">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>h = H(i-1,j-1) + S(i,j)</p>
 
@@ -376,11 +325,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-17">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>h = H(i,j) = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}</p>
 
@@ -392,11 +341,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-18">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>save H(i,j) to h1 for the next column</p>
 
@@ -408,11 +357,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-19">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>update the max score in this row</p>
 
@@ -427,11 +376,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-20">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>e = E(i+1,j)</p>
 
@@ -442,11 +391,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-21">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>save E(i+1,j) for the next row</p>
 
@@ -459,11 +408,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-22">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>f = F(i,j+1)</p>
 
@@ -474,11 +423,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-23">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>z[i,j] keeps h for the current cell and e/f for the next cell</p>
 
@@ -501,11 +450,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-24">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>backtrack to recover the alignment/cigar</p>
 
@@ -526,11 +475,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-25">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>then add soft cliping</p>
 
@@ -543,11 +492,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-26">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>(i,k) points to the last cell</p>
 
@@ -571,11 +520,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-27">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>match</p>
 
@@ -587,11 +536,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-28">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>deletion</p>
 
@@ -603,11 +552,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-29">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>insertion</p>
 
@@ -622,11 +571,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-30">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>add soft clipping</p>
 
@@ -640,11 +589,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-31">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>add the first insertion or deletion</p>
 
@@ -662,11 +611,11 @@ If we only want to compute the max score, delete all lines involving direction ‚
         </li>
         
         
-        <li id="section-32">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>reverse CIGAR</p>
 
@@ -675,23 +624,25 @@ If we only want to compute the max score, delete all lines involving direction ‚
             <div class="content"><div class='highlight'><pre>      tmp = cigar[i];
       cigar[i] = cigar[cigar.length<span class="hljs-number">-1</span>-i], cigar[cigar.length<span class="hljs-number">-1</span>-i] = tmp;
     }
-    <span class="hljs-keyword">return</span> [score, start_i, cigar];
-  }</pre></div></div>
+    <span class="hljs-keyword">return</span> {<span class="hljs-string">'score'</span>: score, <span class="hljs-string">'position'</span>: start_i, <span class="hljs-string">'CIGAR'</span>: cigar};
+  };</pre></div></div>
             
         </li>
         
         
-        <li id="section-33">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <h2 id="generate-scoring-matrix-from-match-mismatch-score">Generate scoring matrix from match/mismatch score</h2>
-<p>@param n     size of the alphabet
-@param a     match score, positive
-@param b     mismatch score, negative</p>
-<p>@return sqaure scoring matrix. The last row and column are zero, for
+<ul>
+<li>n    - size of the alphabet</li>
+<li>a    - match score, positive</li>
+<li>b    - mismatch score, negative</li>
+</ul>
+<p>Returns a sqaure scoring matrix. The last row and column are zero, for
 matching an ambiguous residue.</p>
 
             </div>
@@ -702,11 +653,11 @@ matching an ambiguous residue.</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>mismatch score b should be non-positive</p>
 
@@ -732,17 +683,19 @@ matching an ambiguous residue.</p>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Generate query profile (a preprocessing step)</p>
-<p>@param _s      sequence in string or post bsg_enc_seq()
-@param _m      score matrix or [match,mismatch] array
-@param table   encoding table; must be consistent with _s and _m</p>
-<p>@return query profile. It is a two-dimensional integer matrix.</p>
+<ul>
+<li>_s     - sequence in string or post bsg_enc_seq()</li>
+<li>_m     - score matrix or [match,mismatch] array</li>
+<li>table  - encoding table; must be consistent with _s and _m</li>
+</ul>
+<p>Returns a query profile. It is a two-dimensional integer matrix.</p>
 
             </div>
             
@@ -758,11 +711,11 @@ matching an ambiguous residue.</p>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>TODO: check if _m is already a matrix!
 TODO: check if it is really a square matrix!</p>
@@ -779,6 +732,42 @@ TODO: check if it is really a square matrix!</p>
       }
     }
     <span class="hljs-keyword">return</span> qp;
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <h2 id="generic-routines">Generic routines</h2>
+<p>Encode a sequence string with table</p>
+<ul>
+<li>seq   - sequence</li>
+<li>table - encoding table; must be of size 256</li>
+</ul>
+<p>Returns an integer array</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  bioseq.bsg_enc_seq = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">seq, table</span>)</span>{
+    <span class="hljs-keyword">if</span>(table == <span class="hljs-literal">null</span>) table = bioseq.nt5;
+    <span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(seq.length);
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; seq.length; ++i){
+      s[i] = table[seq.charCodeAt(i)];
+    }
+    <span class="hljs-keyword">return</span> s;
+  };
+
+  bioseq.cigar2str = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">cigar</span>)</span>{
+    <span class="hljs-keyword">var</span> s = [];
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> k = <span class="hljs-number">0</span>; k &lt; cigar.length; ++k){
+      s.push((cigar[k]&gt;&gt;<span class="hljs-number">4</span>).toString() + <span class="hljs-string">"MIDNSHP=XB"</span>.charAt(cigar[k]&amp;<span class="hljs-number">0xf</span>));
+    }
+    <span class="hljs-keyword">return</span> s.join();
   };
 
   bioseq.cigar2gaps = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">target, query, start, cigar</span>)</span>{
@@ -858,14 +847,6 @@ TODO: check if it is really a square matrix!</p>
       }
     }
     <span class="hljs-keyword">return</span> [ot, oq];
-  };
-
-  bioseq.cigar2str = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">cigar</span>)</span>{
-    <span class="hljs-keyword">var</span> s = [];
-    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> k = <span class="hljs-number">0</span>; k &lt; cigar.length; ++k){
-      s.push((cigar[k]&gt;&gt;<span class="hljs-number">4</span>).toString() + <span class="hljs-string">"MIDNSHP=XB"</span>.charAt(cigar[k]&amp;<span class="hljs-number">0xf</span>));
-    }
-    <span class="hljs-keyword">return</span> s.join();
   };
 
   <span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> exports !== <span class="hljs-string">'undefined'</span>){
