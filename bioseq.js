@@ -3,13 +3,6 @@
 
 (function(){
 
-  // The following implementation is ported from klib/ksw.c. The original C
-  // implementation has a few bugs which have been fixed here. Like the C
-  // version, this implementation should be very efficient. It could be made more
-  // efficient if we use typed integer arrays such as Uint8Array. In addition,
-  // I mixed the local and global alignments together. For performance,
-  // it would be preferred to separate them out.
-
   var bioseq = {};
 
    // Common data tables
@@ -36,31 +29,15 @@
     4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4,   4, 4, 4, 4
   ];
 
-  //## Generic routines
-  // Encode a sequence string with table
-  //
-  // seq    sequence
-  // table  encoding table; must be of size 256
-  //
-  // Returns an integer array
-  bioseq.bsg_enc_seq = function(seq, table){
-    if(table == null) table = bioseq.nt5;
-    var s = new Array(seq.length);
-    for(var i = 0; i < seq.length; ++i){
-      s[i] = table[seq.charCodeAt(i)];
-    }
-    return s;
-  }
-
   // Local or global pairwise alignemnt
   //
-  // *target*  target string
-  // *query*   query string or query profile
-	// is_local  perform local alignment
-  // matrix    square score matrix or [match,mismatch] array
-  // gapsc     [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext
-  // w         bandwidth, disabled by default
-  // table     encoding table. It defaults to bioseq.nt5.
+  // * *target* - target string
+  // * *query*  - query string or query profile
+	// * is_local - perform local alignment
+  // * matrix   - square score matrix or [match,mismatch] array
+  // * gapsc    - [gap_open,gap_ext] array; k-length gap costs gap_open+gap_ext
+  // * w        - bandwidth, disabled by default
+  // * table    - encoding table. It defaults to bioseq.nt5.
   //
   // Returns {score, target_start, cigar}. cigar is encoded in the BAM way,
 	// where higher 28 bits keeps the length and lower 4 bits the operation in
@@ -234,13 +211,13 @@
       cigar[i] = cigar[cigar.length-1-i], cigar[cigar.length-1-i] = tmp;
     }
     return {'score': score, 'position': start_i, 'CIGAR': cigar};
-  }
+  };
 
   //## Generate scoring matrix from match/mismatch score
   //
-  // n     size of the alphabet
-  // a     match score, positive
-  // b     mismatch score, negative
+  // * n    - size of the alphabet
+  // * a    - match score, positive
+  // * b    - mismatch score, negative
   //
   // Returns a sqaure scoring matrix. The last row and column are zero, for
   // matching an ambiguous residue.
@@ -266,9 +243,9 @@
 
   // Generate query profile (a preprocessing step)
   //
-  // _s      sequence in string or post bsg_enc_seq()
-  // _m      score matrix or [match,mismatch] array
-  // table   encoding table; must be consistent with _s and _m
+  // * _s     - sequence in string or post bsg_enc_seq()
+  // * _m     - score matrix or [match,mismatch] array
+  // * table  - encoding table; must be consistent with _s and _m
   //
   // Returns a query profile. It is a two-dimensional integer matrix.
   bioseq.gen_query_profile = function(_s, _m, table){
@@ -291,6 +268,30 @@
       }
     }
     return qp;
+  };
+
+  //## Generic routines
+  // Encode a sequence string with table
+  //
+  // * seq   - sequence
+  // * table - encoding table; must be of size 256
+  //
+  // Returns an integer array
+  bioseq.bsg_enc_seq = function(seq, table){
+    if(table == null) table = bioseq.nt5;
+    var s = new Array(seq.length);
+    for(var i = 0; i < seq.length; ++i){
+      s[i] = table[seq.charCodeAt(i)];
+    }
+    return s;
+  };
+
+  bioseq.cigar2str = function(cigar){
+    var s = [];
+    for(var k = 0; k < cigar.length; ++k){
+      s.push((cigar[k]>>4).toString() + "MIDNSHP=XB".charAt(cigar[k]&0xf));
+    }
+    return s.join();
   };
 
   bioseq.cigar2gaps = function(target, query, start, cigar){
@@ -318,14 +319,6 @@
       }
     }
     return [ot, oq];
-  };
-
-  bioseq.cigar2str = function(cigar){
-    var s = [];
-    for(var k = 0; k < cigar.length; ++k){
-      s.push((cigar[k]>>4).toString() + "MIDNSHP=XB".charAt(cigar[k]&0xf));
-    }
-    return s.join();
   };
 
   if(typeof exports !== 'undefined'){
