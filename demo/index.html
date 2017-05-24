@@ -65,39 +65,37 @@
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="../bioseq.js"></script>
 	<script type="text/javascript">
-	function do_align(){
-		var time_start = new Date().getTime();
-		var target = $('#s1')[0].value.replace(/[\s\n]+/g, '');
-		var query  = $('#s2')[0].value.replace(/[\s\n]+/g, '');
-		var ms   = parseInt($('#match').val());
-		var mms  = parseInt($('#mismatch').val());
-		var gapo = parseInt($('#gapo').val());
-		var gape = parseInt($('#gape').val());
-		var is_local = $('#is_local').is(':checked');
-		var rst = bioseq.align(target, query, is_local, [ms, mms], [gapo, gape]);
-		var str = 'start: ' + rst[1] + '\n' +
-							'alignment:\n\n';
-		var fmt = bioseq.cigar2gaps(target, query, rst[1], rst[2]);
-
-		var linelen = $('#output').width()/8;
-		for (var l = 0; l < fmt[0].length; l += linelen){
-			str += fmt[0].substr(l, linelen) + '\n';
-			str += fmt[1].substr(l, linelen) + '\n\n';
-		}
-
-		$('#output').val(str);
-
-		var elapse = (new Date().getTime() - time_start) / 1000.0;
-		$('#runtime').html("in " + elapse.toFixed(3) + "s");
-	}
-
 	$(function(){
 		$("#dloop").click(e => {
 			$("#s1").val(paMT);
 			$("#s2").val(hsdloop);
 		});
 
-		$("#align").click(do_align);
+		$("#align").click(() => {
+			var time_start = new Date().getTime();
+			var target = $('#s1')[0].value.replace(/[\s\n]+/g, '');
+			var query  = $('#s2')[0].value.replace(/[\s\n]+/g, '');
+			var ms   = parseInt($('#match').val());
+			var mms  = parseInt($('#mismatch').val());
+			var gapo = parseInt($('#gapo').val());
+			var gape = parseInt($('#gape').val());
+			var is_local = $('#is_local').is(':checked');
+			var rst = bioseq.align(target, query, is_local, [ms, mms], [gapo, gape]);
+			var str = 'starting position: ' + rst.position + '\n' + 'alignment:\n\n';
+			var fmt = bioseq.cigar2gaps(target, query, rst.position, rst.CIGAR);
+
+			// This odd business just formats the sequences to approximately fit in the
+			// available space. fmt[0] and fmt[1] are the aligned sequences.
+			var linelen = $('#output').width()/8;
+			for (var l = 0; l < fmt[0].length; l += linelen){
+				str += fmt[0].substr(l, linelen) + '\n';
+				str += fmt[1].substr(l, linelen) + '\n\n';
+			}
+			$('#output').val(str);
+
+			var elapse = (new Date().getTime() - time_start) / 1000.0;
+			$('#runtime').html("in " + elapse.toFixed(3) + "s");
+		});
 	});
 
 	var hsdloop = "TTCTTTCATGGGGAAGCAGATTTGGGTACCACCCAAGTATTGACTCACCCATCAACAACCGCTATGTATTTCGTACATTACTGCCAGCCACCATGAATATTGTACGGTACCATAAATACTTGACCACCTGTAGTACATAAAAACCCAATCCACATCAAAACCCCCTCCCCATGCTTACAAGCAAGTACAGCAATCAACCCTCAACTATCACACATCAACTGCAACTCCAAAGCCACCCCTCACCCACTAGGATACCAACAAACCTACCCACCCTTAACAGTACATAGTACATAAAGCCATTTACCGTACATAGCACATTACAGTCAAATCCCTTCTCGTCCCCATGGATGACCCCCCTCAGATAGGGGTCCCTTGACCACCATCCTCCGTGAAATCAATATCCCGCACAAGAGTGCTACTCTCCTCGCTCCGGGCCCATAACACTTGGGGGTAGCTAAAGTGAACTGTATCCGACATCTGGTTCCTACTTCAGGGTCATAAAGCCTAAATAGCCCACACGTTCCCCTTAAATAAGACATCACGATGGATCACAGGTCTATCACCCTATTAACCACTCACGGGAGCTCTCCATGCATTTGGTATTTTCGTCTGGGGGGTATGCACGCGATAGCATTGCGAGACGCTGGAGCCGGAGCACCCTATGTCGCAGTATCTGTCTTTGATTCCTGCCTCATCCTATTATTTATCGCACCTACGTTCAATATTACAGGCGAACATACTTACTAAAGTGTGTTAATTAATTAATGCTTGTAGGACATAATAATAACAATTGAATGTCTGCACAGCCACTTTCCACACAGACATCATAACAAAAAATTTCCACCAAACCCCCCCTCCCCCGCTTCTGGCCACAGCACTTAAACACATCTCTGCCAAACCCCAAAAACAAAGAACCCTAACACCAGCCTAACCAGATTTCAAATTTTATCTTTTGGCGGTATGCACTTTTAACAGTCACCCCCCAACTAACACATTATTTTCCCCTCCCACTCCCATACTACTAATCTCATCAATACAACCCCCGCCCATCCTACCCAGCACACACACACCGCTGCTAACCCCATACCCCGAACCAACCAAACCCCAAAGACACCCCCCACA";
