@@ -1,7 +1,7 @@
 {
   "name": "bioseq",
-  "version": "0.1.0",
-  "description": "A fast, lightweight implementation of Smith-Waterman",
+  "version": "0.1.1",
+  "description": "A Fast, Lightweight Smith-Waterman Sequence Aligner",
   "main": "dist/bioseq.js",
   "scripts": {
     "build": "uglifyjs dist/bioseq.js > dist/bioseq.min.js",
