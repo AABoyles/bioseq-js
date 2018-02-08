@@ -2,7 +2,7 @@
   "name": "bioseq",
   "version": "0.1.0",
   "description": "A fast, lightweight implementation of Smith-Waterman",
-  "main": "bioseq.js",
+  "main": "dist/bioseq.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
