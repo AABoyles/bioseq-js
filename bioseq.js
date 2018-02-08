@@ -1,4 +1,4 @@
-
+;
 'use strict';
 
 (function(){
@@ -70,13 +70,14 @@
         H[j] = E[j] = 0;
       }
     } else {
-      H[0] = 0; E[0] = -gapoe - gapoe;
+      H[0] = 0; E[0] = -gapoe - gapo;
       for(var j = 1; j <= qlen; ++j){
         if(j >= w){
           // everything is -inf outside the band
           H[j] = E[j] = Number.NEGATIVE_INFINITY;
         } else {
-          H[j] = -(gapo + gape * j), E[j] = E[j-1] - gape;
+          H[j] = -(gapoe + gape * (j - 1));
+          E[j] = -(gapoe + gapoe + gape * j);
         }
       }
     }
@@ -90,8 +91,8 @@
       var beg = i > w ? i - w : 0;
       var end = i + w + 1 < qlen ? i + w + 1 : qlen;
       if(!is_local){
-        h1 = beg > 0 ? Number.NEGATIVE_INFINITY : -gapoe - gape * i;
-        f = beg > 0 ? Number.NEGATIVE_INFINITY : -gapoe - gapoe - gape * i;
+        h1 = beg > 0 ? Number.NEGATIVE_INFINITY : -(gapoe + gape * i);
+        f  = beg > 0 ? Number.NEGATIVE_INFINITY : -(gapoe + gapoe + gape * i);
       }
       for(var j = beg; j < end; ++j){
         // At the beginning of the loop: h=H[j]=H(i-1,j-1), e=E[j]=E(i,j), f=F(i,j) and h1=H(i,j-1)
