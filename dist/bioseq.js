@@ -318,7 +318,7 @@
     }
     exports.bioseq = bioseq;
   } else {
-    window.bioseq = bioseq;
+    self.bioseq = bioseq;
   }
 
 })();
