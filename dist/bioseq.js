@@ -1,8 +1,15 @@
-;
-'use strict';
-
-(function(){
-
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define([], function() {
+      return (root.bioseq = factory());
+    });
+  } else if(typeof module === 'object' && module.exports){
+    module.exports = factory();
+  } else {
+    root.bioseq = factory();
+  }
+}(typeof self !== 'undefined' ? self : this, function(){
+  "use strict";
   var bioseq = {};
 
   bioseq.makeIntArray = function(length, bitSize, fill){
@@ -312,13 +319,5 @@
     return [ot, oq];
   };
 
-  if(typeof exports !== 'undefined'){
-    if(typeof module !== 'undefined' && module.exports){
-      exports = module.exports = bioseq;
-    }
-    exports.bioseq = bioseq;
-  } else {
-    self.bioseq = bioseq;
-  }
-
-})();
+  return bioseq;
+}));
