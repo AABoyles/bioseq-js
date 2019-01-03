@@ -1,6 +1,6 @@
 {
   "name": "bioseq",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A Fast, Lightweight Smith-Waterman Sequence Aligner",
   "main": "dist/bioseq.js",
   "scripts": {
