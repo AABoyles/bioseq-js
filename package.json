@@ -4,7 +4,7 @@
   "description": "A Fast, Lightweight Smith-Waterman Sequence Aligner",
   "main": "dist/bioseq.js",
   "scripts": {
-    "build": "uglifyjs dist/bioseq.js > dist/bioseq.min.js",
+    "build": "node_modules/terser/bin/uglifyjs dist/bioseq.js -c -m > dist/bioseq.min.js",
     "serve": "http-server"
   },
   "repository": {
@@ -19,6 +19,6 @@
   "homepage": "https://aaboyles.github.io/bioseq-js",
   "devDependencies": {
     "http-server": "^0.11.1",
-    "uglify": "^0.1.5"
+    "terser": "^3.14.0"
   }
 }
