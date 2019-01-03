@@ -12,7 +12,7 @@
     "url": "git+https://github.com/AABoyles/bioseq-js.git"
   },
   "author": "Tony Boyles",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/AABoyles/bioseq-js/issues"
   },
