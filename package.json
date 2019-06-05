@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AABoyles/bioseq-js.git"
+    "url": "git+https://github.com/CDCgov/bioseq-js.git"
   },
-  "author": "Tony Boyles",
+  "author": "Tony Boyles <nsp3@cdc.gov>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/AABoyles/bioseq-js/issues"
+    "url": "https://github.com/CDCgov/bioseq-js/issues"
   },
-  "homepage": "https://aaboyles.github.io/bioseq-js",
+  "homepage": "https://CDCgov.github.io/bioseq-js",
   "devDependencies": {
     "http-server": "^0.11.1",
     "terser": "^3.14.0"
