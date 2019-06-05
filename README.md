@@ -103,6 +103,17 @@ want to show the CIGAR (for some reason), you're going to need this.
 Takes a pair of sequences and a CIGAR and returns an array of sequences which
 have been aligned according to the instructions in the CIGAR.
 
+- _reference_ - The same reference sequence you passed to `bioseq.align`
+- _query_ - The same query you passed to `bioseq.align`
+- _start_ - The `position` value of the object returned by `bioseq.align`
+- _cigar_ - The `CIGAR` value of the object retruned by `bioseq.align`
+
+And optionally,
+
+- fixed - A boolean indicating whether the reference is fixed or modifiable.
+  Basically, if you're aligning many sequences to the same reference, you should
+  set fixed to `true`. Otherwise you can [just leave it out](https://developer.mozilla.org/en-US/docs/Glossary/Falsy).
+
 ## Theory
 
 `bioseq` implements local and global pairwise alignment with affine gap
