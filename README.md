@@ -6,7 +6,7 @@ A Fast, Lightweight Smith-Waterman Sequence Aligner
 
 ### Demo
 
-[Click here to try it out.](http://aaboyles.github.io/bioseq-js/demo/)
+[Click here to try it out.](http://cdcgov.github.io/bioseq-js/demo/)
 
 ### Installation
 
@@ -24,7 +24,7 @@ From there, you can require it wherever is convenient:
 const bioseq = require("bioseq");
 ```
 
-Alternately, if you just want it in the browser, [download it](https://github.com/AABoyles/bioseq-js/archive/master.zip)
+Alternately, if you just want it in the browser, [download it](https://github.com/CDCgov/bioseq-js/archive/master.zip)
 and include it with a script tag, like so:
 
 ```html
@@ -49,7 +49,7 @@ console.log(fmt[0]);
 console.log(fmt[1]);
 ```
 
-For a more comprehensive example, view the source of [demo/index.html](https://github.com/AABoyles/bioseq-js/blob/master/demo/index.html#L67)
+For a more comprehensive example, view the source of [demo/index.html](https://github.com/CDCgov/bioseq-js/blob/master/demo/index.html#L67)
 
 ### API
 
