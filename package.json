@@ -19,6 +19,6 @@
   "homepage": "https://CDCgov.github.io/bioseq-js",
   "devDependencies": {
     "http-server": "^0.11.1",
-    "terser": "^3.14.0"
+    "terser": "^3.17.0"
   }
 }
