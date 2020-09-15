@@ -1,11 +1,11 @@
 {
   "name": "bioseq",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A Fast, Lightweight Smith-Waterman Sequence Aligner",
   "main": "dist/bioseq.js",
   "scripts": {
-    "build": "node_modules/terser/bin/uglifyjs dist/bioseq.js -c -m > dist/bioseq.min.js",
-    "serve": "http-server"
+    "build": "npx terser dist/bioseq.js -c -m > dist/bioseq.min.js",
+    "serve": "npx http-server"
   },
   "repository": {
     "type": "git",
@@ -16,9 +16,5 @@
   "bugs": {
     "url": "https://github.com/CDCgov/bioseq-js/issues"
   },
-  "homepage": "https://CDCgov.github.io/bioseq-js",
-  "devDependencies": {
-    "http-server": "^0.11.1",
-    "terser": "^3.17.0"
-  }
+  "homepage": "https://CDCgov.github.io/bioseq-js"
 }
